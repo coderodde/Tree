@@ -21,6 +21,11 @@ public final class TreeNodeChildrenView<E> implements Set<TreeNode<E>> {
      */
     private final TreeNode<E> ownerTreeNode;
     
+    /**
+     * Constructs this view for the input tree node.
+     * 
+     * @param ownerTreeNode the tree node this children view belongs to.
+     */
     TreeNodeChildrenView(TreeNode<E> ownerTreeNode) {
         this.ownerTreeNode = ownerTreeNode;
     }
@@ -88,22 +93,18 @@ public final class TreeNodeChildrenView<E> implements Set<TreeNode<E>> {
         treeNode.parent = ownerTreeNode;
         return true;
     }
-    
-    private void checkInputTreeNodeIsNotPredecessorOfThisTreeNode(
-            TreeNode<E> treeNode) {
-        TreeNode<E> currentTreeNode = ownerTreeNode;
-        
-        while (currentTreeNode != null) {
-            if (currentTreeNode == treeNode) {
-                throw new IllegalStateException(
-                        "Trying to create a cycle in this tree.");
-            }
-        }
-    }
 
     @Override
     public boolean remove(Object o) {
-        return ownerTreeNode.children.remove(o);
+        if (o == null) {
+            return false;
+        } else if (!(o instanceof TreeNode)) {
+            return false;
+        }
+        
+        TreeNode<E> treeNode = (TreeNode<E>) o;
+        treeNode.parent = null;
+        return ownerTreeNode.children.remove(treeNode);
     }
 
     @Override
@@ -163,5 +164,24 @@ public final class TreeNodeChildrenView<E> implements Set<TreeNode<E>> {
     @Override
     public <T> T[] toArray(T[] a) {
         throw new UnsupportedOperationException();
+    }
+    
+    /**
+     * Checks that the input tree node is not a predecessor of itself.
+     * 
+     * @param treeNode the tree node to check.
+     */
+    private void checkInputTreeNodeIsNotPredecessorOfThisTreeNode(
+            TreeNode<E> treeNode) {
+        TreeNode<E> currentTreeNode = ownerTreeNode;
+        
+        while (currentTreeNode != null) {
+            if (currentTreeNode == treeNode) {
+                throw new IllegalStateException(
+                        "Trying to create a cycle in this tree.");
+            }
+            
+            currentTreeNode = currentTreeNode.parent;
+        }
     }
 }

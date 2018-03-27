@@ -1,6 +1,10 @@
 package net.coderodde.util;
 
 import java.util.Iterator;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -12,6 +16,8 @@ import org.junit.Test;
  */
 public final class TreeTest {
     
+    // Tests mainly adding a tree node, containment query on views and 
+    // iterating over views.
     @Test
     public void testAddNode() {
         Tree<Integer> tree = new Tree<>();
@@ -46,6 +52,91 @@ public final class TreeTest {
         
         // Check the order in which the roots are returned:
         Iterator<TreeNode<Integer>> iterator = pseudorootChildView.iterator();
-        assertTrue(true);
+        assertEquals(root1, iterator.next());
+        assertEquals(root2, iterator.next());
+        assertFalse(iterator.hasNext()); // Iteration done.
+        
+        iterator = root1.getChildren().iterator();
+        
+        assertEquals(root1Child1, iterator.next());
+        assertEquals(root1Child2, iterator.next());
+        assertFalse(iterator.hasNext());
+        
+        iterator = root2.getChildren().iterator();
+        
+        assertEquals(root2Child1, iterator.next());
+        assertEquals(root2Child2, iterator.next());
+        assertEquals(root2Child3, iterator.next());
+        assertFalse(iterator.hasNext());
+        
+        iterator = root1Child1.getChildren().iterator();
+        
+        assertEquals(root1Child1Child1, iterator.next());
+        assertFalse(iterator.hasNext());
+    }
+    
+    @Test
+    public void testChildrenViewSize() {
+        Tree<Integer> tree = new Tree<>();
+        TreeNode<Integer> root1 = tree.getPseudoRoot().addChild(1);
+        TreeNode<Integer> root2 = tree.getPseudoRoot().addChild(2);
+        
+        root1.addChild(11);
+        root1.addChild(12);
+        
+        assertEquals(2, root1.getChildren().size());
+        assertEquals(0, root2.getChildren().size());
+    }
+    
+    @Test
+    public void testChildrenViewIsEmpty() {
+        Tree<Integer> tree = new Tree<>();
+        TreeNode<Integer> root1 = tree.getPseudoRoot().addChild(1);
+        TreeNode<Integer> root2 = tree.getPseudoRoot().addChild(2);
+        
+        root1.addChild(11);
+        root1.addChild(12);
+        
+        assertFalse(root1.getChildren().isEmpty());
+        assertTrue(root2.getChildren().isEmpty());
+    }
+    
+    @Test
+    public void testChildrenViewRemove() {
+        Tree<Integer> tree = new Tree<>();
+        TreeNode<Integer> root = tree.getPseudoRoot().addChild(1);
+        TreeNode<Integer> child = root.addChild(11);
+        
+        assertNotNull(root.parent);
+        assertNotNull(child.parent);
+        
+        root.getChildren().remove(child);
+        
+        assertNull(child.parent);
+        assertNotNull(root.parent);
+        
+        tree.getPseudoRoot().getChildren().remove(root);
+        
+        assertNull(root.parent);
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void testDetectsSelfLoops() {
+        Tree<Integer> tree = new Tree<>();
+        TreeNode<Integer> root = tree.getPseudoRoot().addChild(1);
+        TreeNode<Integer> child1 = root.addChild(11);
+        TreeNode<Integer> child2 = child1.addChild(111);
+        
+        child2.getChildren().add(child2);
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void testDetectsLoops() {
+        Tree<Integer> tree = new Tree<>();
+        TreeNode<Integer> root = tree.getPseudoRoot().addChild(1);
+        TreeNode<Integer> child1 = root.addChild(11);
+        TreeNode<Integer> child2 = child1.addChild(111);
+        
+        child2.getChildren().add(child1);
     }
 }
