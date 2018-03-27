@@ -1,9 +1,5 @@
 package net.coderodde.util;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 /**
  * This class implements a general tree data structure.
  * 
@@ -11,13 +7,13 @@ import java.util.Set;
  * @version 1.6 (Mar 27, 2018)
  * @param <E> the tree node element type.
  */
-public final class Tree<E> {
+public final class GeneralTree<E> {
    
     /**
      * The root node. This node does not logically belong to this tree as it
      * merely provides a way of having multiple "roots". 
      */
-    private final TreeNode<E> root = new TreeNode<>(null);
+    private final GeneralTreeNode<E> root = new GeneralTreeNode<>(null);
     
     /**
      * Returns the root node. It is <b>not</b> considered to belong to the
@@ -25,7 +21,7 @@ public final class Tree<E> {
      * 
      * @return the pseudoroot of this tree.
      */
-    public TreeNode<E> getPseudoRoot() {
+    public GeneralTreeNode<E> getPseudoRoot() {
         return root;
     }
     
@@ -35,15 +31,15 @@ public final class Tree<E> {
     }
     
     public static void main(String[] args) {
-        Tree<Integer> tree = new Tree<>();
+        GeneralTree<Integer> tree = new GeneralTree<>();
         
-        TreeNode<Integer> root1 = tree.getPseudoRoot().addChild(1);
-        TreeNode<Integer> root2 = tree.getPseudoRoot().addChild(2);
+        GeneralTreeNode<Integer> root1 = tree.getPseudoRoot().addChild(1);
+        GeneralTreeNode<Integer> root2 = tree.getPseudoRoot().addChild(2);
         
         root1.addChild(11);
         root1.addChild(12);
         root1.addChild(13);
-        TreeNode<Integer> child21 = root2.addChild(21);
+        GeneralTreeNode<Integer> child21 = root2.addChild(21);
         child21.addChild(211);
         
         System.out.println("");
