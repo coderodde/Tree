@@ -1,6 +1,7 @@
 package net.coderodde.util;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
@@ -13,14 +14,14 @@ import java.util.Set;
  * @version 1.6 (Mar 27, 2018)
  * @param <E> the tree node element type.
  */
-public final class GeneralTreeNodeChildrenView<E> implements Set<GeneralTreeNode<E>> {
+public final class TreeNodeChildrenView<E> implements Set<TreeNode<E>> {
 
     /**
      * The tree node that owns this view.
      */
-    private final GeneralTreeNode<E> ownerTreeNode;
+    private final TreeNode<E> ownerTreeNode;
     
-    GeneralTreeNodeChildrenView(GeneralTreeNode<E> ownerTreeNode) {
+    TreeNodeChildrenView(TreeNode<E> ownerTreeNode) {
         this.ownerTreeNode = ownerTreeNode;
     }
     
@@ -55,7 +56,7 @@ public final class GeneralTreeNodeChildrenView<E> implements Set<GeneralTreeNode
     public boolean contains(Object o) {
         if (o == null) {
             return false;
-        } else if (!(o instanceof GeneralTreeNode)) {
+        } else if (!(o instanceof TreeNode)) {
             return false;
         } else {
             return ownerTreeNode.children.contains(o);
@@ -68,12 +69,12 @@ public final class GeneralTreeNodeChildrenView<E> implements Set<GeneralTreeNode
      * @return an iterator over this view's children.
      */
     @Override
-    public Iterator<GeneralTreeNode<E>> iterator() {
+    public Iterator<TreeNode<E>> iterator() {
         return ownerTreeNode.children.iterator();
     }
 
     @Override
-    public boolean add(GeneralTreeNode<E> treeNode) {
+    public boolean add(TreeNode<E> treeNode) {
         Objects.requireNonNull(treeNode, "The input tree node is null.");
         checkInputTreeNodeIsNotPredecessorOfThisTreeNode(treeNode);
         
@@ -89,8 +90,8 @@ public final class GeneralTreeNodeChildrenView<E> implements Set<GeneralTreeNode
     }
     
     private void checkInputTreeNodeIsNotPredecessorOfThisTreeNode(
-            GeneralTreeNode<E> treeNode) {
-        GeneralTreeNode<E> currentTreeNode = ownerTreeNode;
+            TreeNode<E> treeNode) {
+        TreeNode<E> currentTreeNode = ownerTreeNode;
         
         while (currentTreeNode != null) {
             if (currentTreeNode == treeNode) {
@@ -117,7 +118,7 @@ public final class GeneralTreeNodeChildrenView<E> implements Set<GeneralTreeNode
     }
 
     @Override
-    public boolean addAll(Collection<? extends GeneralTreeNode<E>> c) {
+    public boolean addAll(Collection<? extends TreeNode<E>> c) {
         boolean modified = !c.isEmpty();
         c.forEach(this::add);
         return modified;
@@ -125,26 +126,42 @@ public final class GeneralTreeNodeChildrenView<E> implements Set<GeneralTreeNode
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return false;
+        int numberOfChildrenBefore = size();
+        
+        Set<?> collectionAsSet = 
+                (c instanceof HashSet) ? (Set<?>) c : new HashSet(c);
+        
+        Iterator<TreeNode<E>> iterator =
+                ownerTreeNode.children.iterator();
+        
+        while (iterator.hasNext()) {
+            TreeNode<E> currentTreeNode = iterator.next();
+            
+            if (!collectionAsSet.contains(currentTreeNode)) {
+                iterator.remove();
+            }
+        }
+        
+        return size() < numberOfChildrenBefore;
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return ownerTreeNode.children.removeAll(c);
     }
 
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ownerTreeNode.children.clear();
     }
 
     @Override
     public Object[] toArray() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }

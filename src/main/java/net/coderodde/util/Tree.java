@@ -7,13 +7,13 @@ package net.coderodde.util;
  * @version 1.6 (Mar 27, 2018)
  * @param <E> the tree node element type.
  */
-public final class GeneralTree<E> {
+public final class Tree<E> {
    
     /**
      * The root node. This node does not logically belong to this tree as it
      * merely provides a way of having multiple "roots". 
      */
-    private final GeneralTreeNode<E> root = new GeneralTreeNode<>(null);
+    private final TreeNode<E> pseudoroot = new TreeNode<>(null);
     
     /**
      * Returns the root node. It is <b>not</b> considered to belong to the
@@ -21,8 +21,8 @@ public final class GeneralTree<E> {
      * 
      * @return the pseudoroot of this tree.
      */
-    public GeneralTreeNode<E> getPseudoRoot() {
-        return root;
+    public TreeNode<E> getPseudoRoot() {
+        return pseudoroot;
     }
     
     @Override
@@ -31,15 +31,15 @@ public final class GeneralTree<E> {
     }
     
     public static void main(String[] args) {
-        GeneralTree<Integer> tree = new GeneralTree<>();
+        Tree<Integer> tree = new Tree<>();
         
-        GeneralTreeNode<Integer> root1 = tree.getPseudoRoot().addChild(1);
-        GeneralTreeNode<Integer> root2 = tree.getPseudoRoot().addChild(2);
+        TreeNode<Integer> root1 = tree.getPseudoRoot().addChild(1);
+        TreeNode<Integer> root2 = tree.getPseudoRoot().addChild(2);
         
         root1.addChild(11);
         root1.addChild(12);
         root1.addChild(13);
-        GeneralTreeNode<Integer> child21 = root2.addChild(21);
+        TreeNode<Integer> child21 = root2.addChild(21);
         child21.addChild(211);
         
         System.out.println("");

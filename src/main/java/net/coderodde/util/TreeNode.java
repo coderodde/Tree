@@ -11,12 +11,12 @@ import java.util.Set;
  * @version 1.6 (Mar 27, 2018)
  * @param <E> the stored element type.
  */
-public final class GeneralTreeNode<E> {
+public final class TreeNode<E> {
     
     /**
      * The element stored in this tree node. May be {@code null}.
      */
-    private final E element;
+    private E element;
     
     /**
      * The parent node of this tree node. We need this in order to make sure
@@ -25,7 +25,7 @@ public final class GeneralTreeNode<E> {
      * 
      * This field is kept package-private so that the TODO
      */
-    GeneralTreeNode<E> parent;
+    TreeNode<E> parent;
     
     /**
      * The set of child nodes. We will use {@link java.util.LinkedHashSet} for 
@@ -36,23 +36,23 @@ public final class GeneralTreeNode<E> {
      * will be always returned before 'B'.
      * 
      * This field is kept package-private so that the 
-     * {@link GeneralTreeNodeChildrenView} can access the actual set of child tree
+     * {@link TreeNodeChildrenView} can access the actual set of child tree
      * nodes.
      */
-    Set<GeneralTreeNode<E>> children;
+    Set<TreeNode<E>> children;
     
     /**
      * The view object over this tree node's children. It is kept 
-     * package-private so that {@link GeneralTreeNodeChildrenView} can access it.
+     * package-private so that {@link TreeNodeChildrenView} can access it.
      */
-    GeneralTreeNodeChildrenView<E> childrenView;
+    TreeNodeChildrenView<E> childrenView;
     
     /**
      * The constructor of this tree node.
      * 
      * @param element the element to set to this tree node. May be {@code null}.
      */
-    GeneralTreeNode(E element) {
+    TreeNode(E element) {
         this.element = element;
         this.parent = null;
     }
@@ -65,14 +65,15 @@ public final class GeneralTreeNode<E> {
      * @return the newly created child node so that the client programmer can
      *         operate on it.
      */
-    public GeneralTreeNode<E> addChild(E element) {
+    public TreeNode<E> addChild(E element) {
         if (children == null) {
             children = new LinkedHashSet<>();
-            childrenView = new GeneralTreeNodeChildrenView<>(this);
+            childrenView = new TreeNodeChildrenView<>(this);
         }
         
-        GeneralTreeNode<E> child = new GeneralTreeNode<>(element);
-        children.add(new GeneralTreeNode<>(element));
+        TreeNode<E> child = new TreeNode<>(element);
+        child.parent = this;
+        children.add(child);
         return child;
     }
     
@@ -82,13 +83,21 @@ public final class GeneralTreeNode<E> {
      * 
      * @return the children of this tree node. 
      */
-    public GeneralTreeNodeChildrenView<E> getChildren() {
+    public TreeNodeChildrenView<E> getChildren() {
         if (children == null) {
             children = new LinkedHashSet<>();
-            childrenView = new GeneralTreeNodeChildrenView<>(this);
+            childrenView = new TreeNodeChildrenView<>(this);
         }
         
         return childrenView;
+    }
+    
+    public E getElement() {
+        return element;
+    }
+    
+    public void setElement(E element) {
+        this.element = element;
     }
     
     @Override
