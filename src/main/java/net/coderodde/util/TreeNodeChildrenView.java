@@ -83,6 +83,12 @@ public final class TreeNodeChildrenView<E> implements Set<TreeNode<E>> {
         Objects.requireNonNull(treeNode, "The input tree node is null.");
         checkInputTreeNodeIsNotPredecessorOfThisTreeNode(treeNode);
         
+        // Return {@code false} whenever the input tree node is already in this
+        // tree.
+        if (ownerTreeNode.children.contains(treeNode)) {
+            return false;
+        }
+        
         // If the input tree node belongs to a parent, disconnect it from it:
         if (treeNode.parent != null) {
             treeNode.parent.children.remove(treeNode);
@@ -120,8 +126,14 @@ public final class TreeNodeChildrenView<E> implements Set<TreeNode<E>> {
 
     @Override
     public boolean addAll(Collection<? extends TreeNode<E>> c) {
-        boolean modified = !c.isEmpty();
-        c.forEach(this::add);
+        boolean modified = false;
+        
+        for (TreeNode<E> treeNode : c) {
+            if (add(treeNode)) {
+                modified = true;
+            }
+        }
+        
         return modified;
     }
 

@@ -1,5 +1,8 @@
 package net.coderodde.util;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -120,6 +123,32 @@ public final class TreeTest {
         assertNull(root.parent);
     }
     
+    @Test
+    public void testChildrenViewRemove2() {
+        Tree<Integer> tree = new Tree<>();
+        TreeNode<Integer> root1 = tree.getPseudoRoot().addChild(1);
+        TreeNode<Integer> root2 = tree.getPseudoRoot().addChild(2);
+        
+        assertTrue(tree.getPseudoRoot().getChildren().contains(root1));
+        assertTrue(tree.getPseudoRoot().getChildren().contains(root2));
+        
+        tree.getPseudoRoot().getChildren().remove(root1);
+        
+        assertFalse(tree.getPseudoRoot().getChildren().contains(root1));
+        assertTrue(tree.getPseudoRoot().getChildren().contains(root2));
+        
+        tree.getPseudoRoot().getChildren().add(root1);
+        tree.getPseudoRoot().getChildren().remove(root2);
+        
+        assertTrue(tree.getPseudoRoot().getChildren().contains(root1));
+        assertFalse(tree.getPseudoRoot().getChildren().contains(root2));
+        
+        tree.getPseudoRoot().getChildren().remove(root1);
+        
+        assertFalse(tree.getPseudoRoot().getChildren().contains(root1));
+        assertFalse(tree.getPseudoRoot().getChildren().contains(root2));
+    }
+    
     @Test(expected = IllegalStateException.class)
     public void testDetectsSelfLoops() {
         Tree<Integer> tree = new Tree<>();
@@ -138,5 +167,112 @@ public final class TreeTest {
         TreeNode<Integer> child2 = child1.addChild(111);
         
         child2.getChildren().add(child1);
+    }
+    
+    @Test
+    public void testChildrenViewContainsAll() {
+        Tree<Integer> tree = new Tree<>();
+        TreeNode<Integer> root1 = tree.getPseudoRoot().addChild(1);
+        TreeNode<Integer> root2 = tree.getPseudoRoot().addChild(2);
+        TreeNode<Integer> root3 = tree.getPseudoRoot().addChild(3);
+        
+        Collection<TreeNode<Integer>> collection = 
+                Arrays.asList(root3, root2, root1);
+        
+        assertTrue(tree.getPseudoRoot().getChildren().containsAll(collection));
+        
+        tree.getPseudoRoot().getChildren().remove(root3);
+        
+        assertFalse(tree.getPseudoRoot().getChildren().containsAll(collection));
+    }
+    
+    @Test
+    public void testAddAll() {
+        Tree<Integer> tree = new Tree<>();
+        Collection<TreeNode<Integer>> collection =
+                Arrays.asList(new TreeNode<>(1),
+                              new TreeNode<>(2),
+                              new TreeNode<>(3));
+        assertTrue(tree.getPseudoRoot().getChildren().addAll(collection));
+        assertFalse(tree.getPseudoRoot().getChildren().addAll(collection));
+        
+        collection = Collections.<TreeNode<Integer>>emptyList();
+        
+        assertFalse(tree.getPseudoRoot().getChildren().addAll(collection));
+        
+        collection = Arrays.asList(new TreeNode<>(1));
+        
+        // We are reinserting the element 1, but they are considered different
+        // nodes:
+        assertTrue(tree.getPseudoRoot().getChildren().addAll(collection));
+        assertFalse(tree.getPseudoRoot().getChildren().addAll(collection));
+    }
+    
+    @Test
+    public void testRetainAll() {
+        Tree<Integer> tree = new Tree<>();
+        TreeNode<Integer> root = tree.getPseudoRoot().addChild(1);
+        TreeNode<Integer> child1 = root.addChild(11);
+        TreeNode<Integer> child2 = root.addChild(12);
+        TreeNode<Integer> child3 = root.addChild(13);
+        TreeNode<Integer> child4 = root.addChild(14);
+        
+        Collection<TreeNode<Integer>> collection = Arrays.asList(child1,
+                                                                 child4);
+        
+        root.getChildren().retainAll(collection);
+        
+        assertTrue(root.getChildren().contains(child1));
+        assertTrue(root.getChildren().contains(child4));
+        
+        assertFalse(root.getChildren().contains(child2));
+        assertFalse(root.getChildren().contains(child3));
+        
+        root.getChildren().retainAll(Arrays.asList(child2));
+        
+        assertFalse(root.getChildren().contains(child2));
+    }
+    
+    @Test
+    public void testRemoveAll() {
+        Tree<Integer> tree = new Tree<>();
+        TreeNode<Integer> root = tree.getPseudoRoot().addChild(1);
+        TreeNode<Integer> child1 = root.addChild(11);
+        TreeNode<Integer> child2 = root.addChild(12);
+        TreeNode<Integer> child3 = root.addChild(13);
+        TreeNode<Integer> child4 = root.addChild(14);
+        
+        Collection<TreeNode<Integer>> collection = Arrays.asList(child1, 
+                                                                 child4);
+        
+        root.getChildren().removeAll(collection);
+        
+        assertFalse(root.getChildren().contains(child1));
+        assertFalse(root.getChildren().contains(child4));
+        
+        assertTrue(root.getChildren().contains(child2));
+        assertTrue(root.getChildren().contains(child3));
+    }
+    
+    @Test
+    public void testClear() {
+        Tree<Integer> tree = new Tree<>();
+        TreeNode<Integer> root = tree.getPseudoRoot().addChild(1);
+        TreeNode<Integer> child1 = root.addChild(11);
+        TreeNode<Integer> child2 = root.addChild(12);
+        TreeNode<Integer> child3 = root.addChild(13);
+        
+        assertTrue(root.getChildren().containsAll(Arrays.asList(child1,
+                                                                child2,
+                                                                child3)));
+        
+        root.getChildren().clear();
+        
+        assertFalse(root.getChildren().contains(child1));
+        assertFalse(root.getChildren().contains(child2));
+        assertFalse(root.getChildren().contains(child3));
+        
+        assertEquals(0, root.getChildren().size());
+        assertTrue(root.getChildren().isEmpty());
     }
 }
