@@ -29,19 +29,4 @@ public final class Tree<E> {
     public String toString() {
         return "";
     }
-    
-    public static void main(String[] args) {
-        Tree<Integer> tree = new Tree<>();
-        
-        TreeNode<Integer> root1 = tree.getPseudoRoot().addChild(1);
-        TreeNode<Integer> root2 = tree.getPseudoRoot().addChild(2);
-        
-        root1.addChild(11);
-        root1.addChild(12);
-        root1.addChild(13);
-        TreeNode<Integer> child21 = root2.addChild(21);
-        child21.addChild(211);
-        
-        System.out.println("");
-    }
 }
